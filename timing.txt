@@ -1,0 +1,30 @@
+My NMI routine:
+
+nmi:    ldx     framefuncptr+1        ; 3 cycles
+        beq     @afterframefunc       ; 3 cycles
+        jsr     @jmp                  ; 6 cycles
+        
+        ...
+        
+@jmp:   jmp     (framefuncptr)        ; 5 cycles
+
+So far, 23 cycles used before frame function is called.
+When using sprite DMA, this leaves me with 2270 - 513 - 23 = 1734 frames of PPU access on NTSC
+
+If frame function is called using the framebreak trick, this is added:
+
+@resume:
+        lda     framebreak_rts+1    ; 3 cycles
+        pha                         ; 3 cycles
+        lda     framebreak_rts      ; 3 cycles
+        pha                         ; 3 cycles
+        lda     framebreak_preg     ; 3 cycles
+        pha                         ; 3 cycles
+        plp                         ; 4 cycles
+        ldy     framebreak_yreg     ; 3 cycles
+        ldx     framebreak_xreg     ; 3 cycles
+        lda     framebreak_areg     ; 3 cycles
+        rts                         ; 6 cycles
+                                    ; TOTAL 37 cycles
+
+So a total of 60 cycles are used before continueing
