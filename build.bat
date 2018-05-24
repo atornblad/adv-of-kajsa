@@ -1,5 +1,7 @@
 @echo off
 
+PATH=.\;..\cc65\bin\
+
 IF [%1_%2]==[_] (
   GOTO :PAL
 )
